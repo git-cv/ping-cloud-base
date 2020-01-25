@@ -16,6 +16,41 @@
 # manifest files for these environments contain deployments of both the Ping Cloud stack and the supporting tools
 # necessary to provide an end-to-end solution.
 #
+# For example, the script produces a directory structure as shown below (files within the directory are omitted for
+# brevity):
+#
+# ├── cluster-state
+# │   └── k8s-configs
+# │       ├── dev
+# │       │   ├── cluster-tools
+# │       │   └── ping-cloud
+# │       │       ├── pingdirectory
+# │       │       └── pingfederate
+# │       ├── prod
+# │       │   ├── cluster-tools
+# │       │   └── ping-cloud
+# │       │       ├── pingdirectory
+# │       │       └── pingfederate
+# │       ├── stage
+# │       │   ├── cluster-tools
+# │       │   └── ping-cloud
+# │       │       ├── pingdirectory
+# │       │       └── pingfederate
+# │       └── test
+# │           ├── cluster-tools
+# │           └── ping-cloud
+# │               ├── pingdirectory
+# │               └── pingfederate
+# └── fluxcd
+#    ├── dev
+#    ├── prod
+#    ├── stage
+#    └── test
+#
+# Deploying the manifests under the fluxcd directory will bootstrap the cluster with a Continuous Delivery tool called
+# flux. Once flux is deployed to the cluster, it will deploy the rest of the ping stack and supporting tools. More
+# details on flux may be found here: https://docs.fluxcd.io/
+#
 # ------------
 # Requirements
 # ------------
@@ -75,11 +110,11 @@
 # CONFIG_REPO_BRANCH     | The branch within the config repo to use for       | master
 #                        | application configuration.                         |
 #                        |                                                    |
-# ARTIFACT_REPO_URL      | The URL for private plugins (e.g. PF kits, PD      | The string "unused".
-#                        | extensions). If not provided, the Ping stack will  |
-#                        | be provisioned without private plugins. This URL   |
-#                        | must use an https scheme, e.g.                     |
-#                        | https://customer-repo.s3-us-west-2.amazonaws.com   |
+# ARTIFACT_REPO_URL      | The URL for plugins (e.g. PF kits, PD extensions). | The string "unused".
+#                        | If not provided, the Ping stack will be            |
+#                        | provisioned without plugins. This URL must always  |
+#                        | have an https scheme, e.g.                         |
+#                        | https://artifacts.s3-us-west-2.amazonaws.com.      |
 #                        |                                                    |
 # PING_ARTIFACT_REPO_URL | This environment variable can be used to overwrite | https://ping-artifacts.s3-us-west-2.amazonaws.com
 #                        | the default endpoint for public plugins. This URL  |
@@ -441,12 +476,15 @@ mkdir -p "${TARGET_DIR}"
 
 # Next build up the directory structure of the cluster-state repo
 FLUXCD_DIR="${TARGET_DIR}/fluxcd"
+CLUSTER_STATE_DIR="${TARGET_DIR}/cluster-state"
+K8S_CONFIGS_DIR="${CLUSTER_STATE_DIR}/k8s-configs"
+
 mkdir -p "${FLUXCD_DIR}"
+mkdir -p "${CLUSTER_STATE_DIR}"
 
-K8S_CONFIGS_DIR="${TARGET_DIR}/k8s-configs"
-mkdir -p "${K8S_CONFIGS_DIR}"
-
-cp ../.gitignore "${TARGET_DIR}"
+cp ../.gitignore "${CLUSTER_STATE_DIR}"
+cp -pr ../profiles "${CLUSTER_STATE_DIR}"
+rm -rf "${CLUSTER_STATE_DIR}/profiles/dev" "${CLUSTER_STATE_DIR}/profiles/aws/pingaccess"
 
 # Now generate the yaml files for each environment
 ENVIRONMENTS='dev test stage prod'
@@ -601,10 +639,10 @@ echo
 echo '------------------------'
 echo '|  Next steps to take  |'
 echo '------------------------'
-echo "1) Push the ${TARGET_DIR}/k8s-configs directory onto the master branch of the tenant cluster-state repo:"
+echo "1) Push ${TARGET_DIR}/cluster-state/* into the master branch of the tenant cluster-state repo:"
 echo "${CLUSTER_STATE_REPO_URL}"
 echo
-echo "2) Add the following identity as the deploy key on the cluster-state (rw) and config repo (ro), if not already added:"
+echo "2) Add the following identity as the deploy key on the cluster-state (rw), if not already added:"
 echo "${SSH_ID_PUB}"
 echo
 echo "3) Deploy flux onto each CDE by navigating to ${TARGET_DIR}/fluxcd and running:"
