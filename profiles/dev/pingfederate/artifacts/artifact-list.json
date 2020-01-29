@@ -1,7 +1,7 @@
 [
   {
-    "nme": "OAuthPlayground",
-    "version": "4.2"
+    "name": "OAuthPlayground",
+    "vsion": "4.2"
   },
   {
     "name": "pf-agentless-integration-kit",
