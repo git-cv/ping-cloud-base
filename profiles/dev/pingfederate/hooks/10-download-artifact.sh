@@ -61,8 +61,8 @@ if test -f "${STAGING_DIR}/artifacts/artifact-list.json"; then
           ARTIFACT_RUNTIME_ZIP=${ARTIFACT_NAME}-${ARTIFACT_VERSION}-runtime.zip
 
           # Check to see if artifact name and version are available
-          if test ! "${ARTIFACT_NAME}" == "null"; then
-            if test ! "${ARTIFACT_VERSION}" == "null"; then
+          if ( ( test ! "${ARTIFACT_NAME}" == "null" ) && ( test ! -z ${ARTIFACT_NAME} ) ); then
+            if ( ( test ! "${ARTIFACT_VERSION}" == "null" ) && ( test ! -z ${ARTIFACT_VERSION} ) ); then
 
               # Check to see if the Artifact Source URL is available
               if ( ( test "${ARTIFACT_SOURCE}" == "private" ) && ( test -z ${ARTIFACT_REPO_URL} ) ) || ( ( test "${ARTIFACT_SOURCE}" == "public" ) && ( test -z ${PING_ARTIFACT_REPO_URL} ) ); then
