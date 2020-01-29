@@ -109,7 +109,7 @@ if test -f "${STAGING_DIR}/artifacts/artifact-list.json"; then
                 fi
               fi
             else
-              echo "Artifact Version for ${ARTIFACT_NAME} could not be rertrieved from ${STAGING_DIR}/artifacts/artifact-list.json"
+              echo "Artifact Version for ${ARTIFACT_NAME} could not be retrieved from ${STAGING_DIR}/artifacts/artifact-list.json"
             fi
           else
             echo "Missing Artifact Name within ${STAGING_DIR}/artifacts/artifact-list.json"
