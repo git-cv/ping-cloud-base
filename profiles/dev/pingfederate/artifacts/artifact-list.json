@@ -1,4 +1,6 @@
-{
-    "name": "OAuthPlayground",
-    "vsion": "4.2"
-}
+[
+  {
+      "name": "OAuthPlayground",
+      "version": "4.2"
+  }
+]
